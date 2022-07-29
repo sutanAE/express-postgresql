@@ -1,6 +1,9 @@
 const express = require('express')
 const path = require('path')
 const app = express()
+const {addUsers} = require('./pg-client')
+
+
 app.use(express.static('./public'))
 
 // importing pg-client
@@ -23,7 +26,29 @@ app.get('/api', (req,res)=>{
     res.sendFile(path.join(__dirname, 'public/home.html'))
 })
 
-app.get('/api/:id', (req,res)=>{
+app.get('/form', (req,res)=>{
+    console.log(__dirname)
+    console.log('getting path')
+
+    res.sendFile(path.join(__dirname, 'public/form.html'))
+})
+
+// post data
+app.use(express.urlencoded({extended:false}))
+app.post('/form/adduser', addUsers, (req,res)=>{
+    console.log(__dirname)
+    console.log('getting path')
+
+    const data = req.body
+
+    const {name,age} = req.body
+    console.log(name,age)
+
+    res.json({"message":"post ok", "data": data})
+})
+
+
+app.get('/api/:id', addUsers, (req,res)=>{
     console.log(__dirname)
     console.log('getting path')
 
@@ -31,6 +56,8 @@ app.get('/api/:id', (req,res)=>{
         'id': req.params['id']
     })
 })
+
+
 
 
 // app.get('/postgres', getUsers, (req,res)=>{
