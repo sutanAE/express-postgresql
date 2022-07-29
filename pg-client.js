@@ -1,29 +1,44 @@
-const express = require('express')
-const path = require('path')
-const app = express()
-app.use(express.static('./static'))
+const message = 'hello from pg-method.js!'
+const Pool = require('pg').Pool
 
 
-// root
-app.get('/', (req,res)=>{
-    console.log(__dirname)
-    console.log('getting path')
-
-    res.sendFile(path.join(__dirname, 'home.html'))
+const pool = new Pool({
+  user: 'postgres',
+  host: 'localhost',
+  database: 'database',
+  password: 'admin',
+  port: 5432,
 })
 
+const getUsers = (request, response) => {
+    pool.query('select * from public.user', (error, results) => {
+      if (error) {
+        throw error
+      }
+      response.status(200).json(results.rows)
+    })
+  }
 
-// postgres
-app.get('/', (req,res)=>{
-    console.log(__dirname)
-    console.log('getting path')
+const addUsers = (request, response) =>{
+    const {name, age} = request.body
+    console.log('processing post data')
 
-    res.sendFile(path.join(__dirname, 'home.html'))
-})
 
-app.get('/postgres', (req,res)=>{
-    console.log(__dirname)
-    console.log('getting path')
+    pool.query(`INSERT INTO public."user" VALUES
+    ('${name}', ${Number(age)});`, (error, results) => {
+        if (error) {
+            console.log('error bro')
+            response.status(200).json({'message': 'post failed'})
+          throw error
+        }
+        console.log('post data sucess!')
+        response.status(200).json({'message': 'post success!'})
+      })
 
-    res.sendFile(path.join(__dirname, 'home.html'))
-})
+}
+
+module.exports = {
+    getUsers,
+    addUsers,
+    message
+  }
