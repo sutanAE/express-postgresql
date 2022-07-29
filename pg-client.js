@@ -37,8 +37,22 @@ const addUsers = (request, response) =>{
 
 }
 
+const deleteUser = (request, response) => {
+    const {name} = request.body
+  
+    pool.query('DELETE FROM public."user" WHERE name = $1', [name], (error, results) => {
+      if (error) {
+        throw error
+      }
+
+      console.log(results)
+      response.status(200).send(`User deleted with ID: ${name}`)
+    })
+  }
+
 module.exports = {
     getUsers,
     addUsers,
+    deleteUser,
     message
   }

@@ -1,7 +1,7 @@
 const express = require('express')
 const path = require('path')
 const app = express()
-const {addUsers} = require('./pg-client')
+const {addUsers, deleteUser} = require('./pg-client')
 
 
 app.use(express.static('./public'))
@@ -33,6 +33,13 @@ app.get('/form', (req,res)=>{
     res.sendFile(path.join(__dirname, 'public/form.html'))
 })
 
+app.get('/delete', (req,res)=>{
+    console.log(__dirname)
+    console.log('getting path')
+
+    res.sendFile(path.join(__dirname, 'public/form_delete.html'))
+})
+
 // post data
 app.use(express.urlencoded({extended:false}))
 app.post('/form/adduser', addUsers, (req,res)=>{
@@ -47,15 +54,18 @@ app.post('/form/adduser', addUsers, (req,res)=>{
     res.json({"message":"post ok", "data": data})
 })
 
-
-app.get('/api/:id', addUsers, (req,res)=>{
+// delete users
+app.post('/api/delete/', deleteUser, (req,res)=>{
     console.log(__dirname)
     console.log('getting path')
 
     res.json({
-        'id': req.params['id']
+        'name': req.params['name']
     })
 })
+
+
+
 
 
 
